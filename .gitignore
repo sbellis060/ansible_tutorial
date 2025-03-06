@@ -1,0 +1,6 @@
+# ignore All files in any directory named keys
+keys/
+
+# I don't want the inventory or ansible.cfg on the public internet
+ansible.cfg
+inventory
