@@ -1,0 +1,14 @@
+---
+
+- hosts: web_servers
+  become: true
+  tasks:
+
+    - name: install apache package
+      ansible.builtin.apt:
+        update_cache: true
+        name: 
+          - apache2 
+          - libapache2-mod-php
+        state: latest
+  
