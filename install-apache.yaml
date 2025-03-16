@@ -4,11 +4,20 @@
   become: true
   tasks:
 
-    - name: install apache package
+    - name: install apache package (Debian based)
       ansible.builtin.apt:
         update_cache: true
         name: 
           - apache2 
           - libapache2-mod-php
         state: latest
-  
+      when: ansible_distribution in ["Debian", "Ubuntu"]
+
+    - name: install apache package (RedHat based)
+      ansible.builtin.dnf:
+        update_cache: true
+        name: 
+          - httpd 
+          - php
+        state: latest
+      when: ansible_distribution == "CentOS"
