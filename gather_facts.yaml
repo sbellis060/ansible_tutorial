@@ -1,0 +1,14 @@
+---
+- name: Gather and display facts
+  hosts: all
+
+  tasks:
+    - name: Gather all facts
+      ansible.builtin.setup:
+
+    - name: Create JSON
+      ansible.builtin.copy:
+        content: "{{ ansible_facts | to_nice_json }}"
+        dest: "./facts/facts_{{ inventory_hostname }}.json"
+      delegate_to: localhost
+
