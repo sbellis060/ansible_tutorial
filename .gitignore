@@ -1,3 +1,6 @@
+# ignore contents of the facts folder
+facts/
+
 # ignore All files in any directory named keys
 keys/
 

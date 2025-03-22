@@ -9,14 +9,31 @@
       ansible.builtin.apt:
         upgrade: dist
         update_cache: true
-      when: ansible_distribution == "Ubuntu"
+      when: ansible_distribution in ["Debian", "Ubuntu"]
 
     - name: install updates (CentOS)
       tags: allways
       ansible.builtin.dnf:
         update_only: true
         update_cache: true
-      when: ansible_distribution == "CentOS"
+      when: ansible_distribution in ["CentOS", "Rocky"]
+
+- hosts: workstations
+  become: true
+
+  tasks:
+  - name: install unzip
+    ansible.builtin.package:
+      name: unzip
+
+  - name: install terraform
+    ansible.builtin.unarchive:
+      src: https://releases.hashicorp.com/terraform/1.11.2/terraform_1.11.2_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: true
+      mode: 0755
+      owner: root
+      group: root
 
 - hosts: web_servers
   become: true
@@ -38,7 +55,7 @@
           - httpd 
           - php
         state: latest
-      when: ansible_distribution == "CentOS"
+      when: ansible_distribution in ["CentOS", "Rocky"]
 
     - name: copy default html file for site
       tags: apache,apache2,httpd
@@ -67,7 +84,7 @@
         name: 
           - mariadb 
         state: latest
-      when: ansible_distribution == "CentOS"
+      when: ansible_distribution in ["CentOS", "Rocky"]
 
 - hosts: file_servers
   become: true
