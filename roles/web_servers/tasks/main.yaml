@@ -1,44 +1,26 @@
-- name: install apache and php package (Debian based)
-  tags: apache,apache2,ubuntu
-  ansible.builtin.apt:
+- name: install apache and php package
+  tags: apache,httpd,php
+  ansible.builtin.package:
     name: 
-      - apache2 
-      - libapache2-mod-php
+      - "{{ apache_package_name }}" 
+      - "{{ php_package_name }}"
     state: latest
-  when: ansible_distribution in ["Debian", "Ubuntu"]
 
-- name: install apache and php package (RedHat based)
-  tags: apache,httpd,centos
-  ansible.builtin.dnf:
-    name: 
-      - httpd 
-      - php
-    state: latest
-  when: ansible_distribution in ["CentOS", "Rocky"]
-
-- name:  start httpd service (CentOS)
-  tags: apache,centos,httpd
+- name:  start and enable httpd service
+  tags: apache,httpd
   ansible.builtin.service:
-    name: httpd
+    name: "{{ apache_service }}"
     state: started
     enabled: true
-  when: ansible_distribution in ["CentOS", "Rocky"]
 
 - name: change e-mail address for admin
   tags: apache,centos,httpd
   ansible.builtin.lineinfile:
     path: /etc/httpd/conf/httpd.conf
     regexp: '^ServerAdmin'
-    line: ServerAdmin somebody@somewhere.net
+    line: ServerAdmin somebody@somewhere.com
   when: ansible_distribution in ["CentOS","Rocky"]
-  register: httpd
-
-- name: restart httpd (CentOS)
-  tags: apache,centos,httpd
-  ansible.builtin.service:
-    name: httpd
-    state: restarted
-  when: httpd.changed
+  notify: restart_apache
 
 - name:  open port 80 (CentOS)
   tags: apache,centos,httpd
