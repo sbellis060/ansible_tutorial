@@ -1,0 +1,14 @@
+- name: install mariadb package (Debian based)
+  tags: db,mariadb,ubuntu
+  ansible.builtin.apt:
+    name: 
+      - mariadb-server 
+    state: latest
+  when: ansible_distribution in ["Debian", "Ubuntu"]
+- name: install mariadb package (RedHat based)
+  tags: db,mariadb,centos
+  ansible.builtin.dnf:
+    name: 
+      - mariadb 
+    state: latest
+  when: ansible_distribution in ["CentOS", "Rocky"]

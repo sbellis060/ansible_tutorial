@@ -1,0 +1,5 @@
+- name: "add authorized keys"
+  ansible.posix.authorized_key:
+    user: simone
+    key: "{{ lookup('file', '~/.ssh/simone_id_ed25519.pub') }}"
+

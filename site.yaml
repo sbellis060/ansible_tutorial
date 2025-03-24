@@ -19,117 +19,26 @@
 
 - hosts: all
   become: true
-  tasks:
-  - name: "add authorized keys"
-    ansible.posix.authorized_key:
-      user: simone
-      key: "{{ lookup('file', '~/.ssh/simone_id_ed25519.pub') }}"
+  roles:
+    - base
 
 - hosts: workstationss
   become: true
-  tasks:
-  - name: install unzip
-    ansible.builtin.package:
-      name: unzip
-
-  - name: install terraform
-    ansible.builtin.unarchive:
-      src: https://releases.hashicorp.com/terraform/1.11.2/terraform_1.11.2_linux_amd64.zip
-      dest: /usr/local/bin
-      remote_src: true
-      mode: 0755
-      owner: root
-      group: root
+  roles:
+    - workstations
 
 - hosts: web_servers
   become: true
-  tasks:
-    - name: install apache and php package (Debian based)
-      tags: apache,apache2,ubuntu
-      ansible.builtin.apt:
-        name: 
-          - apache2 
-          - libapache2-mod-php
-        state: latest
-      when: ansible_distribution in ["Debian", "Ubuntu"]
-
-    - name: install apache and php package (RedHat based)
-      tags: apache,httpd,centos
-      ansible.builtin.dnf:
-        name: 
-          - httpd 
-          - php
-        state: latest
-      when: ansible_distribution in ["CentOS", "Rocky"]
-
-    - name:  start httpd service (CentOS)
-      tags: apache,centos,httpd
-      ansible.builtin.service:
-        name: httpd
-        state: started
-        enabled: true
-      when: ansible_distribution in ["CentOS", "Rocky"]
-
-    - name: change e-mail address for admin
-      tags: apache,centos,httpd
-      ansible.builtin.lineinfile:
-        path: /etc/httpd/conf/httpd.conf
-        regexp: '^ServerAdmin'
-        line: ServerAdmin somebody@somewhere.net
-      when: ansible_distribution in ["CentOS","Rocky"]
-      register: httpd
-
-    - name: restart httpd (CentOS)
-      tags: apache,centos,httpd
-      ansible.builtin.service:
-        name: httpd
-        state: restarted
-      when: httpd.changed
-
-    - name:  open port 80 (CentOS)
-      tags: apache,centos,httpd
-      ansible.posix.firewalld:
-        port: 80/tcp
-        state: enabled
-        permanent: true
-        immediate: true
-      when: ansible_distribution in ["CentOS", "Rocky"]
-
-    - name: copy default html file for site
-      tags: apache,apache2,httpd
-      ansible.builtin.copy:
-        src: default_site.html
-        dest: /var/www/html/index.html
-        owner: root
-        group: root
-        mode: 0644
+  roles:
+    - web_servers
 
 - hosts: db_servers
   become: true
-  tasks:
-    - name: install mariadb package (Debian based)
-      tags: db,mariadb,ubuntu
-      ansible.builtin.apt:
-        name: 
-          - mariadb-server 
-        state: latest
-      when: ansible_distribution in ["Debian", "Ubuntu"]
-
-    - name: install mariadb package (RedHat based)
-      tags: db,mariadb,centos
-      ansible.builtin.dnf:
-        name: 
-          - mariadb 
-        state: latest
-      when: ansible_distribution in ["CentOS", "Rocky"]
+  roles:
+    - db_servers
 
 - hosts: file_servers
   become: true
-  tasks:
-    - name: install samba package
-      tags: samba
-      ansible.builtin.package:
-        name: 
-          - samba 
-        state: latest
-
+  roles:
+    - file_servers
+    
